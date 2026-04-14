@@ -24,6 +24,10 @@ export class AuthService {
     return this.prismaService.user.findUnique({ where: { email } });
   }
 
+  async findById(id: number): Promise<User | null> {
+    return this.prismaService.user.findUnique({ where: { id } });
+  }
+
   generateTokens(user: User): {
     access_token: string;
     refresh_token: string;
