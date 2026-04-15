@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Prisma, User } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { TIME_DURATION } from 'common/constants';
-import { RefreshTokenDto } from './dto/refreshToken.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -86,7 +86,7 @@ export class AuthService {
       // Nếu có lỗi, kiểm tra xem có phải là lỗi Prisma P2002 (Trùng dữ liệu Unique) không
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ConflictException('Email này đã được sử dụng!');
+          throw new ConflictException('Email has already exist!');
         }
       }
       throw new InternalServerErrorException();
