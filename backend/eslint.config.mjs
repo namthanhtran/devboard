@@ -32,6 +32,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-*': 'off',
+      // '@typescript-eslint/no-redundant-type-constituents': 'off',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },

@@ -11,7 +11,7 @@ export class ProjectsService {
   async create(
     userId: number,
     createProjectDto: CreateProjectDto,
-  ): Promise<Project | null> {
+  ): Promise<Project> {
     return this.prismaService.project.create({
       data: {
         ...createProjectDto,

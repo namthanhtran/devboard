@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateProjectDto {
+export class CreateCollectionDto {
   @IsString()
   @IsNotEmpty()
   name: string;

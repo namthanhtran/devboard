@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt-auth.guard';
 import { ProjectsModule } from './projects/projects.module';
+import { CollectionsModule } from './collections/collections.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProjectsModule],
+  imports: [PrismaModule, AuthModule, ProjectsModule, CollectionsModule],
   controllers: [AppController],
   providers: [
     AppService,
