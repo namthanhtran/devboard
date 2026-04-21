@@ -8,6 +8,7 @@ import { JwtGuard } from './auth/guards/jwt-auth.guard';
 import { ProjectsModule } from './projects/projects.module';
 import { CollectionsModule } from './collections/collections.module';
 import { RequestsModule } from './requests/requests.module';
+import { EnvironmentsModule } from './environments/environments.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RequestsModule } from './requests/requests.module';
     ProjectsModule,
     CollectionsModule,
     RequestsModule,
+    EnvironmentsModule,
   ],
   controllers: [AppController],
   providers: [
