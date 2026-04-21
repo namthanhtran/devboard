@@ -7,9 +7,16 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt-auth.guard';
 import { ProjectsModule } from './projects/projects.module';
 import { CollectionsModule } from './collections/collections.module';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProjectsModule, CollectionsModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    ProjectsModule,
+    CollectionsModule,
+    RequestsModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
