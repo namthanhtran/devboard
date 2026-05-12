@@ -46,7 +46,9 @@ export class EnvironmentsService {
     return this.prismaService.environment.create({
       data: {
         projectId,
-        ...createEnvironmentDto,
+        name: createEnvironmentDto.name,
+        isActive: createEnvironmentDto.isActive,
+        variables: createEnvironmentDto.variables as any,
       },
     });
   }
@@ -62,7 +64,11 @@ export class EnvironmentsService {
       where: {
         id: environmentId,
       },
-      data: updateEnvironmentDto,
+      data: {
+        name: updateEnvironmentDto.name,
+        isActive: updateEnvironmentDto.isActive,
+        variables: updateEnvironmentDto.variables as any,
+      },
     });
   }
 
