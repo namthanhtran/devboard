@@ -2,6 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateRequestDto } from './dto/create-request-dto';
 import { UpdateRequestDto } from './dto/update-request-dto';
+import { replaceVariables } from './helpers/variable-replacer';
+import Variable from 'common/types/Variables';
+import axios from 'axios';
 
 @Injectable()
 export class RequestsService {
@@ -77,6 +80,77 @@ export class RequestsService {
     await this.findOne(userId, requestId);
     return this.prismaService.request.delete({
       where: { id: requestId },
+    });
+  }
+
+  async send(userId: number, requestId: number) {
+    const request = await this.verifyRequestOwner(userId, requestId);
+    const projectId = request.collection.project.id;
+
+    const environment = await this.prismaService.environment.findFirst({
+      where: { projectId, isActive: true },
+    });
+
+    const variables = (environment?.variables ?? []) as unknown as Variable[];
+    const url = replaceVariables(request.url, variables);
+
+    const startTime = Date.now();
+
+    try {
+      const response = await axios({
+        method: request.method,
+        url,
+        headers: (request.headers as Record<string, string>) || {},
+        data: request.method === 'GET' ? undefined : request.body,
+      });
+      const duration = Date.now() - startTime;
+
+      await this.prismaService.requestHistory.create({
+        data: {
+          requestId,
+          statusCode: response.status,
+          responseBody: JSON.stringify(response.data),
+          responseHeaders: response.headers as any,
+          duration,
+        },
+      });
+
+      return {
+        statusCode: response.status,
+        responseBody: response.data,
+        responseHeaders: response.headers,
+        duration,
+      };
+    } catch (error: any) {
+      const duration = Date.now() - startTime;
+
+      await this.prismaService.requestHistory.create({
+        data: {
+          requestId,
+          statusCode: error?.response?.status || 0,
+          responseBody: JSON.stringify(
+            error?.response?.data || error?.message || '',
+          ),
+          responseHeaders: error?.response?.headers || {},
+          duration,
+        },
+      });
+
+      return {
+        statusCode: error?.response?.status || 0,
+        responseBody: error?.response?.data || error?.message || '',
+        responseHeaders: error?.response?.headers || {},
+        duration,
+      };
+    }
+  }
+
+  async getHistory(userId: number, requestId: number) {
+    await this.verifyRequestOwner(userId, requestId);
+    return this.prismaService.requestHistory.findMany({
+      where: { requestId },
+      orderBy: { sentAt: 'desc' },
+      take: 50,
     });
   }
 }

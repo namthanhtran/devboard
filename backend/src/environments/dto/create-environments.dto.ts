@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import Variable from 'common/types/Variables';
 
 export class CreateEnvironmentDto {
   @IsString()
@@ -12,11 +13,7 @@ export class CreateEnvironmentDto {
   name: string;
 
   @IsArray()
-  variables: {
-    key: string;
-    value: string;
-    enabled: boolean;
-  }[];
+  variables: Variable[];
 
   @IsBoolean()
   @IsOptional()
