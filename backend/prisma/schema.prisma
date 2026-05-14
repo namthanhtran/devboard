@@ -32,6 +32,7 @@ model User {
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   refreshTokens RefreshToken[]
+  monitors      Monitor[]  
 
   @@map("users")
 }
@@ -47,6 +48,7 @@ model Project {
   updatedAt    DateTime      @updatedAt @map("updated_at")
   collections  Collection[]
   environments Environment[]
+  monitors     Monitor[]
 
   @@map("projects")
 }
@@ -108,4 +110,66 @@ model RequestHistory {
   sentAt          DateTime @default(now()) @map("sent_at")
 
   @@map("request_history")
+}
+
+
+// Monitor module Golang
+model Monitor {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId       Int?
+  project         Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  name            String
+  url             String
+  method          String    @default("GET")
+  interval        Int       @default(60)
+  timeout         Int       @default(10)
+  expectedStatus  Int       @default(200)
+  isActive        Boolean   @default(true)
+  isPaused        Boolean   @default(false)
+
+  alertEnabled      Boolean @default(false)
+  telegramChatId    String?
+  telegramBotToken  String?
+
+  lastStatus      String?
+  lastCheckedAt   DateTime?
+  lastLatency     Int?
+
+  pings           Ping[]
+  incidents       Incident[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Ping {
+  id          Int      @id @default(autoincrement())
+  monitorId   Int
+  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  status      String
+  statusCode  Int?
+  latency     Int?
+  error       String?
+
+  checkedAt   DateTime @default(now())
+
+  @@index([monitorId, checkedAt])
+}
+
+model Incident {
+  id          Int       @id @default(autoincrement())
+  monitorId   Int
+  monitor     Monitor   @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  startedAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  duration    Int?
+  cause       String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
