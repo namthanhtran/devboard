@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/namthanhtran/devboard/monitor-service/internal/api/handlers"
 	"github.com/namthanhtran/devboard/monitor-service/internal/api/middleware"
 	"github.com/namthanhtran/devboard/monitor-service/internal/config"
 	"gorm.io/gorm"
@@ -23,10 +24,17 @@ func NewRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 	})
 
 	// Protected routes
-	auth := r.Group("")
+	auth := r.Group("/")
 	auth.Use(middleware.JWTAuth(cfg.JwtAccessSecret))
 	{
 		// Handler
+		monitors := handlers.NewMonitorHandler(db)
+
+		auth.POST("/monitors", monitors.Create)
+		auth.GET("/monitors", monitors.List)
+		auth.GET("/monitors/:id", monitors.GetById)
+		auth.PATCH("/monitors/:id", monitors.Update)
+		auth.DELETE("/monitors/:id", monitors.Delete)
 	}
 
 	return r
